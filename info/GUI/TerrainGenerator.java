@@ -1,11 +1,10 @@
 package GUI;
 
-
-import javax.swing.JPanel;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.Random;
 
-public class TerrainGenerator extends JPanel {
+public class TerrainGenerator {
     private final int width;
     private final int height;
     private final int gridSize;
@@ -15,12 +14,7 @@ public class TerrainGenerator extends JPanel {
         this.width = width;
         this.height = height;
         this.gridSize = gridSize;
-        this.setPreferredSize(new Dimension(width, height));
         this.noise = generateSmoothNoise(gridSize, gridSize);
-    }
-
-    public TerrainGenerator() {
-        this(1024, 768, 100); // default size for no-args constructor
     }
 
     private double[][] generateSmoothNoise(int rows, int cols) {
@@ -57,17 +51,18 @@ public class TerrainGenerator extends JPanel {
     }
 
     private Color elevationToColor(double value) {
-        if (value < 0.4) return new Color(0, 0, 150);      // Deep water
-        if (value < 0.5) return new Color(0, 100, 255);     // Shallow water
-        if (value < 0.6) return new Color(50, 200, 50);     // Grass
-        if (value < 0.75) return new Color(100, 255, 100);  // High grass
-        if (value < 0.9) return new Color(150, 150, 150);   // Rock
-        return Color.WHITE;                                 // Snow
+        if (value < 0.4) return new Color(0, 0, 150);
+        if (value < 0.5) return new Color(0, 100, 255);
+        if (value < 0.6) return new Color(50, 200, 50);
+        if (value < 0.75) return new Color(100, 255, 100);
+        if (value < 0.9) return new Color(150, 150, 150);
+        return Color.WHITE;
     }
 
-    @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
+    public BufferedImage drawToImage() {
+        BufferedImage img = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = img.createGraphics();
+
         int cellWidth = width / gridSize;
         int cellHeight = height / gridSize;
 
@@ -76,5 +71,8 @@ public class TerrainGenerator extends JPanel {
                 g.setColor(elevationToColor(noise[y][x]));
                 g.fillRect(x * cellWidth, y * cellHeight, cellWidth, cellHeight);
             }
+
+        g.dispose();
+        return img;
     }
 }
